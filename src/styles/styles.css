@@ -28,11 +28,16 @@ body {
     display: flex;
     flex-direction: column;
     padding: 20px;
+    position: relative;
 }
 
 .fighter:hover {
     box-shadow: 0 0 50px 10px rgba(0,0,0,0.06);
     cursor: pointer;
+}
+
+.fighter.selected {
+    background-color: yellow;
 }
 
 .name {
@@ -57,4 +62,17 @@ body {
     font-size: 18px;
     background: rgba(255, 255, 255, 0.7);
     visibility: hidden;
+}
+
+.fighter-details {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    border: 1px solid rgb(116, 116, 116);
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.fighter-details .data-row {
+    margin-bottom: 5px;
 }

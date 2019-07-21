@@ -1,5 +1,7 @@
 import View from './view';
 import FighterView from './fighterView';
+import { fighterService } from './services/fightersService';
+import FighterDetailsView from './fighterDetailsView';
 
 class FightersView extends View {
   constructor(fighters) {
@@ -11,6 +13,8 @@ class FightersView extends View {
 
   fightersDetailsMap = new Map();
 
+  selectedFighters = new Map();
+
   createFighters(fighters) {
     const fighterElements = fighters.map(fighter => {
       const fighterView = new FighterView(fighter, this.handleClick);
@@ -21,12 +25,43 @@ class FightersView extends View {
     this.element.append(...fighterElements);
   }
 
-  handleFighterClick(event, fighter) {
-    this.fightersDetailsMap.set(fighter._id, fighter);
-    console.log('clicked')
-    // get from map or load info and add to fightersMap
-    // show modal with fighter info
-    // allow to edit health and power in this modal
+  async handleFighterClick(event, fighter) {
+    const id = fighter._id;
+    const fighterElement = event.target.closest('.fighter');
+    const fighterDetails = await this.getFighterDetails(id);
+    const detailsView = new FighterDetailsView(fighterDetails);
+
+    if (this.selectedFighters.has(id)) {
+      return;
+    }
+
+    // reset if selected more than 2
+    if (this.selectedFighters.size >= 2) {
+      this.selectedFighters.clear();
+      document.querySelectorAll('.fighter').forEach((item) => {
+        item.classList.remove('selected');
+      });
+
+      document.querySelectorAll('.fighter-details').forEach((item) => {
+        item.parentNode.removeChild(item); 
+      });
+    }
+
+    // mark selected item
+    this.selectedFighters.set(id, fighterDetails);
+    fighterElement.classList.add('selected');
+
+    fighterElement.append(detailsView.element);
+  }
+
+  async getFighterDetails(id) {
+    let details = this.fightersDetailsMap.get(id);
+    if (!details) {
+      details = await fighterService.getFighterDetails(id);
+      this.fightersDetailsMap.set(id, details);
+    }
+
+    return details;
   }
 }
 
